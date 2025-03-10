@@ -2,23 +2,25 @@ package com.granvilledon.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.Gson;
+import com.granvilledon.grapiclientsdk.client.GrapiClient;
 import com.granvilledon.project.annotation.AuthCheck;
-import com.granvilledon.project.common.BaseResponse;
-import com.granvilledon.project.common.DeleteRequest;
-import com.granvilledon.project.common.ErrorCode;
-import com.granvilledon.project.common.ResultUtils;
+import com.granvilledon.project.common.*;
 import com.granvilledon.project.constant.CommonConstant;
 import com.granvilledon.project.exception.BusinessException;
 import com.granvilledon.project.model.dto.interfaceinfo.InterfaceInfoAddRequest;
+import com.granvilledon.project.model.dto.interfaceinfo.InterfaceInfoInvokeRequest;
 import com.granvilledon.project.model.dto.interfaceinfo.InterfaceInfoQueryRequest;
 import com.granvilledon.project.model.dto.interfaceinfo.InterfaceInfoUpdateRequest;
 import com.granvilledon.project.model.entity.InterfaceInfo;
 import com.granvilledon.project.model.entity.User;
+import com.granvilledon.project.model.enums.InterfaceInfoStatusEnum;
 import com.granvilledon.project.service.InterfaceInfoService;
 import com.granvilledon.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -37,10 +39,10 @@ public class InterfaceInfoController {
 
     @Resource
     private InterfaceInfoService interfaceinfoService;
-
     @Resource
     private UserService userService;
-
+    @Resource
+    private GrapiClient grapiClient;
     // region 增删改查
 
     /**
@@ -195,5 +197,105 @@ public class InterfaceInfoController {
     }
 
     // endregion
-
+    /**
+     * 发布
+     *
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/online")
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest,
+                                                     HttpServletRequest request) {
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        long id = idRequest.getId();
+        // 判断是否存在
+        InterfaceInfo oldInterfaceInfo = interfaceinfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        // 判断改接口是否可以调用
+        com.granvilledon.grapiclientsdk.model.User user = new com.granvilledon.grapiclientsdk.model.User();
+        user.setUsername("granvilledon");
+        String username = grapiClient.getUsernameByPost(user);
+        if (StringUtils.isBlank(username)) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
+        }
+        // 仅本人或管理员可修改
+        InterfaceInfo interfaceinfo = new InterfaceInfo();
+        interfaceinfo.setId(id);
+        interfaceinfo.setStatus(InterfaceInfoStatusEnum.ONLINE.getValue());
+        boolean result = interfaceinfoService.updateById(interfaceinfo);
+        return ResultUtils.success(result);
+    }
+    /**
+     * 下线
+     *
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/offline")
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest,
+                                                     HttpServletRequest request) {
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        long id = idRequest.getId();
+        // 判断是否存在
+        InterfaceInfo oldInterfaceInfo = interfaceinfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        // 判断改接口是否可以调用
+        com.granvilledon.grapiclientsdk.model.User user = new com.granvilledon.grapiclientsdk.model.User();
+        user.setUsername("granvilledon");
+        String username = grapiClient.getUsernameByPost(user);
+        if (StringUtils.isBlank(username)) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
+        }
+        // 仅本人或管理员可修改
+        InterfaceInfo interfaceinfo = new InterfaceInfo();
+        interfaceinfo.setId(id);
+        interfaceinfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getValue());
+        boolean result = interfaceinfoService.updateById(interfaceinfo);
+        return ResultUtils.success(result);
+    }
+    /**
+     * 调用接口
+     *
+     * @param interfaceInfoInvokeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/invoke")
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<String> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
+                                                      HttpServletRequest request) {
+        if (interfaceInfoInvokeRequest == null || interfaceInfoInvokeRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        long id = interfaceInfoInvokeRequest.getId();
+        String userRequestParams = interfaceInfoInvokeRequest.getUserRequestParams();
+        // 判断是否存在
+        InterfaceInfo oldInterfaceInfo = interfaceinfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if (oldInterfaceInfo.getStatus() == InterfaceInfoStatusEnum.OFFLINE.getValue()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "接口已关闭");
+        }
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        GrapiClient tempClient = new GrapiClient(accessKey, secretKey);
+        Gson gson = new Gson();
+        com.granvilledon.grapiclientsdk.model.User user = gson.fromJson(userRequestParams, com.granvilledon.grapiclientsdk.model.User.class);
+        String usernameByPost = tempClient.getUsernameByPost(user);
+        return ResultUtils.success(usernameByPost);
+    }
 }

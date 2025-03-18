@@ -1,7 +1,7 @@
 package com.granvilledon.project.service;
 
-import com.granvilledon.project.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.granvilledon.grapicommon.model.entity.InterfaceInfo;
 
 /**
 * @author tangu
@@ -9,5 +9,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2025-03-05 19:11:25
 */
 public interface InterfaceInfoService extends IService<InterfaceInfo> {
-    public void validInterfaceInfo(InterfaceInfo interfaceInfo, boolean add);
+
+    void validInterfaceInfo(InterfaceInfo interfaceInfo, boolean add);
 }

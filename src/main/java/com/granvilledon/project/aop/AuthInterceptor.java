@@ -1,10 +1,10 @@
 package com.granvilledon.project.aop;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.granvilledon.grapicommon.model.entity.User;
 import com.granvilledon.project.annotation.AuthCheck;
 import com.granvilledon.project.common.ErrorCode;
 import com.granvilledon.project.exception.BusinessException;
-import com.granvilledon.project.model.entity.User;
 import com.granvilledon.project.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;

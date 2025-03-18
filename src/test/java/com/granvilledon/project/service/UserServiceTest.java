@@ -1,6 +1,6 @@
 package com.granvilledon.project.service;
 
-import com.granvilledon.project.model.entity.User;
+import com.granvilledon.grapicommon.model.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

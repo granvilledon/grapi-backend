@@ -2,10 +2,10 @@ package com.granvilledon.project.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.granvilledon.grapicommon.model.entity.User;
 import com.granvilledon.project.common.ErrorCode;
 import com.granvilledon.project.exception.BusinessException;
 import com.granvilledon.project.mapper.UserMapper;
-import com.granvilledon.project.model.entity.User;
 import com.granvilledon.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

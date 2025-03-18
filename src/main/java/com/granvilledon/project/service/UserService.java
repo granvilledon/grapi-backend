@@ -2,7 +2,7 @@ package com.granvilledon.project.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.granvilledon.project.model.entity.User;
+import com.granvilledon.grapicommon.model.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
 

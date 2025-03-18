@@ -1,7 +1,9 @@
 package com.granvilledon.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.granvilledon.project.model.entity.UserInterfaceInfo;
+import com.granvilledon.grapicommon.model.entity.UserInterfaceInfo;
+
+import java.util.List;
 
 /**
 * @author tangu
@@ -11,6 +13,7 @@ import com.granvilledon.project.model.entity.UserInterfaceInfo;
 */
 public interface UserInterfaceInfoMapper extends BaseMapper<UserInterfaceInfo> {
 
+    List<UserInterfaceInfo> listTopInvokeInterfaceInfo(int limit);
 }
 
 

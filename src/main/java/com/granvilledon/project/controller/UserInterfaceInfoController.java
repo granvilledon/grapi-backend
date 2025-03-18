@@ -2,6 +2,8 @@ package com.granvilledon.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.granvilledon.grapicommon.model.entity.User;
+import com.granvilledon.grapicommon.model.entity.UserInterfaceInfo;
 import com.granvilledon.project.annotation.AuthCheck;
 import com.granvilledon.project.common.*;
 import com.granvilledon.project.constant.CommonConstant;
@@ -10,8 +12,6 @@ import com.granvilledon.project.exception.BusinessException;
 import com.granvilledon.project.model.dto.userinterfaceinfo.UserInterfaceInfoAddRequest;
 import com.granvilledon.project.model.dto.userinterfaceinfo.UserInterfaceInfoQueryRequest;
 import com.granvilledon.project.model.dto.userinterfaceinfo.UserInterfaceInfoUpdateRequest;
-import com.granvilledon.project.model.entity.UserInterfaceInfo;
-import com.granvilledon.project.model.entity.User;
 import com.granvilledon.project.service.UserInterfaceInfoService;
 import com.granvilledon.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package com.granvilledon.project.mapper;
 
-import com.granvilledon.project.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.granvilledon.grapicommon.model.entity.InterfaceInfo;
 
 /**
 * @author tangu

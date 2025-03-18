@@ -2,6 +2,7 @@ package com.granvilledon.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.granvilledon.grapicommon.model.entity.User;
 import com.granvilledon.project.annotation.AuthCheck;
 import com.granvilledon.project.common.BaseResponse;
 import com.granvilledon.project.common.DeleteRequest;
@@ -13,7 +14,6 @@ import com.granvilledon.project.model.dto.post.PostAddRequest;
 import com.granvilledon.project.model.dto.post.PostQueryRequest;
 import com.granvilledon.project.model.dto.post.PostUpdateRequest;
 import com.granvilledon.project.model.entity.Post;
-import com.granvilledon.project.model.entity.User;
 import com.granvilledon.project.service.PostService;
 import com.granvilledon.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,5 +1,6 @@
 package com.granvilledon.project.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.granvilledon.grapicommon.model.entity.UserInterfaceInfo;
@@ -7,6 +8,7 @@ import com.granvilledon.project.common.ErrorCode;
 import com.granvilledon.project.exception.BusinessException;
 import com.granvilledon.project.mapper.UserInterfaceInfoMapper;
 import com.granvilledon.project.service.UserInterfaceInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 * @createDate 2025-03-10 15:40:21
 */
 @Service
+@Slf4j
 public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoMapper, UserInterfaceInfo>
         implements UserInterfaceInfoService{
 
@@ -51,6 +54,21 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         return this.update(updateWrapper);
     }
 
+    @Override
+    public int getLeftNum(long interfaceInfoId, long userId) {
+        if (userId <= 0 || interfaceInfoId <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        UserInterfaceInfo userInterfaceInfo = this.getOne(new QueryWrapper<UserInterfaceInfo>()
+                .eq("userId", userId)
+                .eq("interfaceInfoId", interfaceInfoId));
+//        log.info("查询用户接口记录：userId={}, interfaceInfoId={}", userId, interfaceInfoId);
+        // 判空处理
+        if (userInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "用户接口记录不存在");
+        }
+        return userInterfaceInfo.getLeftNum();
+    }
 }
 
 

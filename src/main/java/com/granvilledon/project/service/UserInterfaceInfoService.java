@@ -21,4 +21,12 @@ public interface UserInterfaceInfoService extends IService<UserInterfaceInfo> {
      * @return
      */
     boolean invokeCount(long interfaceInfoId, long userId);
+
+    /**
+     * 获取是否还有剩余调用次数
+     * @param interfaceInfoId
+     * @param userId
+     * @return
+     */
+    int getLeftNum(long interfaceInfoId, long userId);
 }

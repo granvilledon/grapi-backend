@@ -1,7 +1,8 @@
 package com.granvilledon.project.service.impl.inner;
 
-import com.granvilledon.project.service.UserInterfaceInfoService;
+
 import com.granvilledon.grapicommon.service.InnerUserInterfaceInfoService;
+import com.granvilledon.project.service.UserInterfaceInfoService;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
@@ -21,5 +22,12 @@ public class InnerUserInterfaceInfoServiceImpl implements InnerUserInterfaceInfo
     @Override
     public boolean invokeCount(long interfaceInfoId, long userId) {
         return userInterfaceInfoService.invokeCount(interfaceInfoId, userId);
+    }
+    @Override
+    public int getLeftNum(long interfaceInfoId, long userId) {
+        if (userInterfaceInfoService == null) {
+            throw new IllegalStateException("userInterfaceInfoService is not injected");
+        }
+        return userInterfaceInfoService.getLeftNum(interfaceInfoId, userId);
     }
 }

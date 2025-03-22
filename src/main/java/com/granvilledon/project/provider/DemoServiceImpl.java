@@ -23,8 +23,8 @@ import org.apache.dubbo.rpc.RpcContext;
 /**
  * 示例服务实现类
  *
- * @author <a href="https://github.com/ligranvilledon">程序员鱼皮</a>
- * @from <a href="https://granvilledon.icu">编程导航知识星球</a>
+ * @author <a href="https://github.com/ligranvilledon">granvilledon</a>
+ * @from <a href="https://granvilledon..site">granvilledon</a>
  */
 @DubboService
 public class DemoServiceImpl implements DemoService {

@@ -7,8 +7,8 @@ import lombok.EqualsAndHashCode;
 /**
  * 接口信息封装视图
  *
- * @author <a href="https://github.com/ligranvilledon">程序员鱼皮</a>
- * @from <a href="https://granvilledon.icu">编程导航知识星球</a>
+ * @author <a href="https://github.com/ligranvilledon">granvilledon</a>
+ * @from <a href="https://granvilledon..site">granvilledon</a>
  * @TableName product
  */
 @EqualsAndHashCode(callSuper = true)

@@ -12,8 +12,10 @@ grapi-backend（聚合工程，Maven 多模块）
 │                       与内部 Dubbo 服务接口（Inner*Service）
 ├── grapi-client-sdk    客户端 SDK（Spring Boot Starter）：请求签名 + HTTP 调用封装，
 │                       使用方只需配置 access-key / secret-key 即可注入 GrapiClient
-└── grapi-service       主服务：用户 / 接口管理 / 调用统计 / 在线调试，
-                        Dubbo provider（Nacos 注册中心），供网关通过 RPC 调用
+├── grapi-service       主服务：用户 / 接口管理 / 调用统计 / 在线调试，
+│                       Dubbo provider（Nacos 注册中心），供网关通过 RPC 调用
+└── grapi-frontend      管理端前端（React 18 + Ant Design Pro 5.x / Umi 4）：
+                        登录 + 接口管理（增删改查 / 分页），对接真实后端接口
 ```
 
 ## 技术栈
@@ -58,7 +60,11 @@ mvn -B package
 java -jar grapi-service/target/grapi-service.jar
 # 服务起在 http://localhost:7529/api，接口文档 /api/doc.html
 
-# 5. SDK 使用（其他 Spring Boot 项目引入 grapi-client-sdk 后）
+# 5. 启动管理端前端（详见 grapi-frontend/README.md）
+cd grapi-frontend && pnpm install && pnpm dev
+# 默认地址 http://localhost:8000，登录后即可管理接口
+
+# 6. SDK 使用（其他 Spring Boot 项目引入 grapi-client-sdk 后）
 # application.yml:
 #   grapi:
 #     client:
@@ -75,6 +81,6 @@ java -jar grapi-service/target/grapi-service.jar
 
 ## 已知限制
 
-- 网关模块（Spring Cloud Gateway 统一鉴权与计费）暂未收录进本仓库，当前仓库为「主服务 + 公共模块 + SDK」三模块。
-- 管理端前端未收录；接口调试可通过 Knife4j 文档页完成。
+- 网关模块（Spring Cloud Gateway 统一鉴权与计费）暂未收录进本仓库，前端管理页直连主服务；调用统计与接口分析页面未实现。
+- 前端目前完成登录与接口管理页，"在线调试"等页面待开发。
 - 签名为基础版（无时间戳/nonce），防重放需在网关层补充。

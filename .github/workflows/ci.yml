@@ -19,7 +19,7 @@ jobs:
 
       # 编译 + 打包（单测依赖外部 MySQL/Redis/Nacos，放到本地跑）
       - name: Build
-        run: mvn -B -q package -DskipTests
+        run: mvn -B -e -ntp package -DskipTests
 
       - name: Verify no secrets committed
         run: |

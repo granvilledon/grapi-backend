@@ -1,73 +1,80 @@
-## 项目简介
+# grapi-backend · API 开放平台
 
-原创项目，一个提供 API 接口供开发者调用的平台。
+一个提供 API 接口供开发者调用的平台：管理员可以接入并发布接口、统计各接口调用情况；用户可以注册登录、开通接口调用权限、在线调试接口，并通过客户端 SDK 在自己的代码里签名调用。
 
-管理员可以接入并发布接口，统计分析各接口调用情况；用户可以注册登录并开通接口调用权限，然后可以浏览接口及在线调试，还能使用客户端 SDK 轻松在代码中调用接口。
+> 说明：本项目基于鱼皮（编程导航）的「API 开放平台」课程学习开发，在其架构与业务流程的基础上完成了工程化整理与问题修复（见下文[相对课程的改进](#相对课程的改进)）。
 
-项目的前端并不复杂，更侧重后端，包含丰富的编程技巧和架构设计层面的知识。
+## 模块结构
 
-## 技术选型
+```
+grapi-backend（聚合工程，Maven 多模块）
+├── grapi-common        公共模块：跨服务共享的实体（User / InterfaceInfo / UserInterfaceInfo）
+│                       与内部 Dubbo 服务接口（Inner*Service）
+├── grapi-client-sdk    客户端 SDK（Spring Boot Starter）：请求签名 + HTTP 调用封装，
+│                       使用方只需配置 access-key / secret-key 即可注入 GrapiClient
+└── grapi-service       主服务：用户 / 接口管理 / 调用统计 / 在线调试，
+                        Dubbo provider（Nacos 注册中心），供网关通过 RPC 调用
+```
 
-### 前端
+## 技术栈
 
-- React 18
-- Ant Design Pro 5.x 脚手架
-- Ant Design & Procomponents 组件库
-- Umi 4 前端框架
-- OpenAPI 前端代码生成
+| 层面 | 技术 |
+|---|---|
+| 框架 | Java 8 · Spring Boot 2.7 · MyBatis-Plus 3.5 |
+| RPC | Dubbo 3 + Nacos 注册中心（分布式改造：网关与服务解耦） |
+| 存储 | MySQL + Redis（Session 共享） |
+| 文档 | Knife4j（Swagger） |
+| 认证 | Session 登录 + API 签名认证（SHA-256 摘要） |
 
+## 调用链路
 
+```
+开发者代码
+   │  GrapiClient（SDK：参数 + ak/sk 签名）
+   ▼
+（网关层，见下文已知限制）
+   │  校验签名 → 扣减调用次数 → Dubbo 泛化调用
+   ▼
+grapi-service ──── MySQL（user / interface_info / user_interface_info）
+```
 
-### 后端
+签名算法：`sign = SHA256(body + "." + secretKey)`，请求头携带 `accessKey / sign / body`，服务端按 accessKey 查出 secretKey 重新计算并比对。SDK 侧实现见 `grapi-client-sdk/src/.../utils/SignUtils.java`。
 
-- Java Spring Boot
-- MySQL 数据库
-- MyBatis-Plus 及 MyBatis X 自动生成
-- API 签名认证（Http 调用）
-- Spring Boot Starter（SDK 开发）
-- Dubbo 分布式（RPC、Nacos）
-- Swagger + Knife4j 接口文档生成
-- Spring Cloud Gateway 微服务网关
-- Hutool、Apache Common Utils、Gson 等工具库
+## 快速开始
 
-## 项目大纲
+```bash
+# 1. 准备环境：JDK 8、Maven 3.8+、MySQL、Redis、Nacos（2.x）
+# 2. 建库建表
+mysql < grapi-service/sql/ddl.sql
 
-1. 项目介绍和计划
-2. 需求分析
-3. 业务流程和子系统介绍
-4. 技术选型（各技术作用讲解）
-5. 前后端项目初始化
-    1. 前端 Ant Design Pro 框架最新版本教程
-    2. 后端 Spring Boot 万用模板使用
-6. 数据库表设计
-7. 前后端代码自动生成（强烈推荐，大幅提高开发效率！）
-8. 登录页开发
-9. 接口管理功能开发（Ant Design 高级组件使用）
-10. 模拟 API 接口项目开发
-11. HTTP 接口调用
-12. API 签名认证详解及开发
-13. 客户端 SDK 开发（Spring Boot Starter）
-14. 管理员接口发布 / 下线功能开发
-15. 接口列表页开发
-16. 在线调试接口功能开发
-17. 接口调用统计开发
-    1. 后端开发
-    2. 优化方案分析及对比
-18. API 网关详解
-    1. 网关介绍及优点
-    2. 10 种网关应用场景
-    3. 网关分类及技术选型
-19. Spring Cloud Gateway 网关实现
-    1. 详细带读官方文档
-    2. 统一业务处理：用户鉴权及接口调用次数统计
-20. 项目分布式改造
-    1. 公共模块抽象
-    2. RPC 和 HTTP 调用详解及对比
-    3. Dubbo 框架讲解及示例项目开发
-    4. Dubbo 业务实战
-21. 管理员统计分析功能
-    1. 前端 2 种可视化库的使用
-    2. 后端聚合查询接口开发
-22. 项目扩展点及上线分析
+# 3. 配置环境变量（口令不落盘）
+export DB_PASSWORD=你的数据库口令
+export GRAPI_ACCESS_KEY=xxx     # 测试用调用方凭证
+export GRAPI_SECRET_KEY=yyy
+# 可选：NACOS_ADDR（默认 localhost:8848）
 
+# 4. 构建并启动主服务
+mvn -B package
+java -jar grapi-service/target/grapi-service.jar
+# 服务起在 http://localhost:7529/api，接口文档 /api/doc.html
 
+# 5. SDK 使用（其他 Spring Boot 项目引入 grapi-client-sdk 后）
+# application.yml:
+#   grapi:
+#     client:
+#       access-key: xxx
+#       secret-key: yyy
+```
+
+## 相对课程的改进
+
+- **修复调用次数超扣缺陷**：`invokeCount` 原实现把 `leftNum > 0` 的守卫注释掉了，并发下余额会扣成负数；已恢复为带条件的原子扣减（`UPDATE ... WHERE leftNum > 0`）。
+- **工程自包含**：原仓库依赖一个不在仓库里的 `grapi-common` 外部 jar、且 `grapi-client-sdk` 是一个没有 `.gitmodules` 的坏 submodule（clone 下来是空目录），clone 后无法编译。现重构为 Maven 多模块聚合工程，`git clone` + `mvn package` 即可构建。
+- **密钥全部外置**：数据库口令、调用方 ak/sk 改为环境变量注入，不再提交到仓库。
+- **清理教程残留**：删除未使用的 Post 系列 DTO/枚举、课程推广注释、错误的外链，SQL 演示数据不再入库。
+
+## 已知限制
+
+- 网关模块（Spring Cloud Gateway 统一鉴权与计费）暂未收录进本仓库，当前仓库为「主服务 + 公共模块 + SDK」三模块。
+- 管理端前端未收录；接口调试可通过 Knife4j 文档页完成。
+- 签名为基础版（无时间戳/nonce），防重放需在网关层补充。
